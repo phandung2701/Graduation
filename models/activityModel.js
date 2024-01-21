@@ -1,26 +1,26 @@
 import mongoose from 'mongoose';
-const pocketSchema = mongoose.Schema(
+const activityShema = mongoose.Schema(
   {
+    action: {
+      type: String,
+    },
     sid: {
       type: String,
     },
-
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
     status: {
       type: String,
-      default: 'active',
     },
-    balance: {
-      type: Number,
-      default: 0,
+    meta: {
+      type: Object,
     },
   },
   {
     timestamps: true,
   }
 );
-const pocketModel = mongoose.model('Pocket', pocketSchema);
-export default pocketModel;
+const activityModel = mongoose.model('Activity', activityShema);
+export default activityModel;

@@ -1,25 +1,34 @@
 import mongoose from 'mongoose';
 const JobApplySchema = mongoose.Schema(
   {
-    title: {
+    sid: {
       type: String,
     },
-    description: {
-      type: Boolean,
-      default: false,
+    job: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Job',
     },
-    users: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
     status: {
       type: String,
     },
-    detail: {
+    requestOffer: {
       type: Object,
     },
-    expireDate: {
+    requestEstTime: {
+      type: Number,
+    },
+    approveDate: {
       type: Date,
+    },
+    requestDate: {
+      type: Date,
+    },
+    progress: {
+      type: String,
     },
   },
   {

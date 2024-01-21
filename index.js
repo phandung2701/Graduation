@@ -7,9 +7,12 @@ import cors from 'cors';
 import userRoutes from './routes/user.js';
 import chatRoutes from './routes/chat.js';
 import messageRoutes from './routes/message.js';
+import jobRoutes from './routes/job.js';
 import * as Server from 'socket.io';
+import morgan from 'morgan';
 
 const app = express();
+
 const corsConfig = {
   origin: process.env.BASE_URL,
   credentials: true,
@@ -19,9 +22,14 @@ const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsConfig));
+
+app.use(morgan('dev'));
+
 app.use('/', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
+app.use('/api/job', jobRoutes);
+
 mongoose.set('strictQuery', false);
 mongoDBConnect();
 const server = app.listen(PORT, () => {

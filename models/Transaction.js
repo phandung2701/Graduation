@@ -1,25 +1,28 @@
 import mongoose from 'mongoose';
 const transactionSchema = mongoose.Schema(
   {
-    title: {
+    sid: {
       type: String,
     },
-    description: {
-      type: Boolean,
-      default: false,
+    amount: {
+      type: Number,
     },
-    users: {
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    receiverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
     status: {
       type: String,
     },
-    detail: {
-      type: Object,
+    transType: {
+      type: String,
     },
-    expireDate: {
-      type: Date,
+    transDate: {
+      type: String,
     },
   },
   {

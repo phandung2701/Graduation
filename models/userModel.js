@@ -19,6 +19,30 @@ const userSchema = mongoose.Schema(
       type: String,
       default: 'Available',
     },
+    role: {
+      type: String,
+      default: 'client',
+    },
+    interest: {
+      type: String,
+    },
+    workExperience: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    skill: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'active',
+    },
+    creditCardStatus: {
+      type: Boolean,
+      default: false,
+    },
     profilePic: {
       type: String,
       default:
