@@ -1,27 +1,27 @@
-import Job from '../models/jobModel.js';
-import JobApply from '../models/jobApplyModel.js';
-import common from '../services/common.js';
-import Notification from '../models/Notification.js';
-import Pocket from '../models/pocket.js';
-import constant from '../services/constant.js';
-import userModel from '../models/userModel.js';
-import moment from 'moment';
+import Job from "../models/jobModel.js";
+import JobApply from "../models/jobApplyModel.js";
+import common from "../services/common.js";
+import Notification from "../models/Notification.js";
+import Pocket from "../models/pocketModel.js";
+import constant from "../services/constant.js";
+import userModel from "../models/userModel.js";
+import moment from "moment";
 
 export const findAllJobs = async (req, res) => {
   try {
     const { title, expectedOffer } = req.body;
     let options = {
-      status: { $nin: ['deleted', 'inactive'] },
+      status: { $nin: ["deleted", "inactive"] },
     };
     if (title) {
       options.title = {
-        $regex: new RegExp(title, 'i'),
+        $regex: new RegExp(title, "i"),
       };
     }
     if (expectedOffer) {
       options.expectedOffer = expectedOffer;
     }
-    const jobs = await Job.find(options).populate('user').sort({ _id: -1 });
+    const jobs = await Job.find(options).populate("user").sort({ _id: -1 });
     res.status(200).json(jobs);
   } catch (error) {
     res.status(500).send(error);
@@ -34,8 +34,8 @@ export const findJobsByUser = async (req, res) => {
     const user = req.rootUserId;
     if (!user) return res.send({ message: "Provide User's Id" });
 
-    const jobs = await Job.find({ user: user, status: { $ne: 'deleted' } })
-      .populate('user')
+    const jobs = await Job.find({ user: user, status: { $ne: "deleted" } })
+      .populate("user")
       .sort({ _id: -1 });
     return res.status(200).json(jobs);
   } catch (error) {
@@ -49,14 +49,14 @@ export const findJobsApply = async (req, res) => {
     const user = req.rootUserId;
     if (!user) return res.send({ message: "Provide User's Id" });
 
-    let jobs = await JobApply.find({ user: user, status: { $ne: 'deleted' } })
-      .populate('user')
-      .populate('job')
+    let jobs = await JobApply.find({ user: user, status: { $ne: "deleted" } })
+      .populate("user")
+      .populate("job")
       .sort({ _id: -1 });
     jobs = jobs.map((job) => {
       if (job.approveDate) {
-        let progress = moment(new Date()).diff(moment(job.approveDate), 'days');
-        job['progress'] = Number(progress) / Number(job.requestEstTime);
+        let progress = moment(new Date()).diff(moment(job.approveDate), "days");
+        job["progress"] = Number(progress) / Number(job.requestEstTime);
       }
       return job;
     });
@@ -71,7 +71,7 @@ export const createJob = async (req, res) => {
   const {
     title,
     description,
-    status = 'active',
+    status = "active",
     detail,
     expireDate,
     expectedOffer,
@@ -96,7 +96,7 @@ export const createJob = async (req, res) => {
     };
     await Job.create(createJob);
 
-    return res.status(200).json('Create Job success!');
+    return res.status(200).json("Create Job success!");
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -114,7 +114,7 @@ export const updateJob = async (req, res) => {
     type,
     estComplete,
   } = req.body;
-  if (!sid) return res.send({ message: 'Job not found' });
+  if (!sid) return res.send({ message: "Job not found" });
   try {
     const createJob = {
       title: title,
@@ -128,12 +128,12 @@ export const updateJob = async (req, res) => {
     };
     const filteredCreateJob = Object.fromEntries(
       Object.entries(createJob).filter(
-        ([key, value]) => value !== undefined && value !== null && value !== ''
+        ([key, value]) => value !== undefined && value !== null && value !== ""
       )
     );
     await Job.update({ sid: sid }, filteredCreateJob);
 
-    return res.status(200).json('Update Job success!');
+    return res.status(200).json("Update Job success!");
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -141,15 +141,15 @@ export const updateJob = async (req, res) => {
 
 export const deleteJob = async (req, res) => {
   const { sid } = req.body;
-  if (!sid) return res.send({ message: 'Job not found' });
+  if (!sid) return res.send({ message: "Job not found" });
   try {
     let job = await Job.findOneAndUpdate(
       { sid: sid },
-      { status: 'deleted' },
+      { status: "deleted" },
       { new: true }
     );
 
-    return res.status(200).json('delete Job success!');
+    return res.status(200).json("delete Job success!");
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -159,16 +159,16 @@ export const applyJob = async (req, res) => {
   const { jobId, requestOffer, requestEstTime } = req.body;
   const user = req.rootUserId;
 
-  if (!jobId || !String(user)) return res.send({ message: 'Job not found' });
+  if (!jobId || !String(user)) return res.send({ message: "Job not found" });
   try {
-    let checkJob = await Job.findOne({ _id: jobId, status: 'active' });
-    if (!checkJob) return res.status(401).json('Job not exist');
+    let checkJob = await Job.findOne({ _id: jobId, status: "active" });
+    if (!checkJob) return res.status(401).json("Job not exist");
     let checkJobApply = await JobApply.findOne({
       job: jobId,
       user: user,
-      status: { $ne: 'reject' },
+      status: { $ne: "reject" },
     });
-    if (checkJobApply) return res.status(401).json('You have apply it');
+    if (checkJobApply) return res.status(401).json("You have apply it");
     let options = {
       sid: common.createDigitsCode(16),
       job: jobId,
@@ -176,7 +176,7 @@ export const applyJob = async (req, res) => {
       requestOffer: requestOffer,
       requestEstTime: requestEstTime,
       requestDate: new Date(),
-      status: 'pending',
+      status: "pending",
     };
     await JobApply.create(options);
     let userInfo = await userModel.findOne({ _id: user });
@@ -184,64 +184,91 @@ export const applyJob = async (req, res) => {
       sid: common.createDigitsCode(16),
       sendTo: user,
       user: checkJob.user,
-      title: 'Apply Job',
+      title: "Apply Job",
       content: `${userInfo.name} just applied to the [JOB-${checkJob.sid}] you posted`,
     });
-    return res.status(200).json('Apply Job success!');
+    return res.status(200).json("Apply Job success!");
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+export const applicationList = async (req, res) => {
+  const { jobId } = req.body;
+  const user = req.rootUserId;
+
+  if (!jobId || !String(user)) return res.send({ message: "Job not found" });
+  try {
+    let list = await JobApply.find({
+      job: jobId,
+    });
+
+    return res.status(200).json({ data: list });
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
 export const approveJob = async (req, res) => {
-  const { sid } = req.body;
+  const { jobApplyId } = req.body;
 
   const userApply = req.rootUserId;
 
   try {
-    if (!sid) return res.status(401).json('Job not found');
+    if (!jobApplyId) return res.status(401).json("Job not found");
 
-    let jobApprove = await JobApply.findOne({ sid: sid, status: 'pending' });
-    if (!jobApprove) return res.status(401).json('Job not found');
+    let jobApprove = await JobApply.findOne({
+      _id: jobApplyId,
+      status: "pending",
+    });
+    if (!jobApprove) return res.status(401).json("Job not found");
 
     let transfer = await transferMoney(
       jobApprove.user,
-      'ADMIN',
+      "ADMIN",
       Number(jobApprove.requestOffer) + constant.FEE
     );
     if (transfer.err !== 0) return res.status(401).json(transfer.msg);
 
     await JobApply.updateOne(
-      { sid: sid },
-      { status: 'inProgress', approveDate: new Date() }
+      { _id: jobApplyId },
+      { status: "inProgress", approveDate: new Date() }
     );
     await Notification.create({
       sid: common.createDigitsCode(16),
       sendTo: userApply,
       user: JobApply.user,
-      title: 'Approve Job',
+      title: "Approve Job",
       content: `Your application for [JOB-${JobApply.sid}] has been approve`,
     });
-    await Job.updateOne({ _id: jobApprove.jobId }, { status: 'inactive' });
+    await Job.updateOne({ _id: jobApprove.job }, { status: "inactive" });
 
-    let updatedRecord = await JobApply.findOneAndUpdate(
-      { jobId: jobApprove.jobId, user: jobApprove.user, sid: { $ne: sid } },
-      { $set: { status: 'reject' } },
-      { new: true }
+    await JobApply.updateMany(
+      {
+        job: jobApprove.job,
+        user: jobApprove.user,
+        _id: { $ne: jobApplyId },
+      },
+      { $set: { status: "reject" } }
     );
-
-    updatedRecord &&
-      updatedRecord.forEach(async (jobApply) => {
-        await Notification.create({
-          sid: common.createDigitsCode(16),
-          sendTo: userApply,
-          user: jobApply.user,
-          title: 'Reject Job',
-          content: `Your application for [JOB-${jobApply.sid}] has been rejected`,
-        });
+    let updatedRecords = await JobApply.find({
+      job: jobApprove.job,
+      user: jobApprove.user,
+      _id: { $ne: jobApplyId },
+    });
+    const promises = updatedRecords.map(async (jobApply) => {
+      await Notification.create({
+        sid: common.createDigitsCode(16),
+        sendTo: userApply,
+        user: jobApply.user,
+        title: "Reject Job",
+        content: `Your application for [JOB-${jobApply.sid}] has been rejected`,
       });
-    return res.status(200).json('Apply Job success!');
+    });
+
+    await Promise.all(promises);
+    return res.status(200).json("Apply Job success!");
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 };
@@ -254,19 +281,19 @@ const transferMoney = async (sender, receiver, amount) => {
     if (Number(amount) <= 0) {
       throw {
         err: 500,
-        msg: 'Invalid amount. Amount should be greater than 0.',
+        msg: "Invalid amount. Amount should be greater than 0.",
       };
     }
 
     const getActivePocket = async (user) => {
-      if (user === 'ADMIN') {
+      if (user === "ADMIN") {
         return await Pocket.findOne({
           user: constant.POCKET_ADMIN,
-          status: 'active',
-        }).populate('user'); //.session(session);
+          status: "active",
+        }).populate("user"); //.session(session);
       } else {
-        return await Pocket.findOne({ user, status: 'active' }).populate(
-          'user'
+        return await Pocket.findOne({ user, status: "active" }).populate(
+          "user"
         ); //.session(session);
       }
     };
@@ -275,9 +302,13 @@ const transferMoney = async (sender, receiver, amount) => {
     const receiverPocket = await getActivePocket(receiver);
 
     if (!senderPocket || senderPocket.balance < amount) {
-      throw { err: 500, msg: 'Insufficient balance for the sender.' };
+      throw { err: 500, msg: "Insufficient balance for the sender." };
     }
-
+    common.transaction({
+      amount: amount,
+      receiverId: receiverPocket.user._id,
+      senderId: senderPocket.user._id,
+    });
     await Pocket.updateOne(
       { _id: senderPocket._id },
       { $inc: { balance: -Number(amount) } }
@@ -298,11 +329,11 @@ const transferMoney = async (sender, receiver, amount) => {
     // await session.commitTransaction();
     // session.endSession();
 
-    return { err: 0, msg: 'Transaction successful.' };
+    return { err: 0, msg: "Transaction successful." };
   } catch (err) {
     // await session.abortTransaction();
     // session.endSession();
 
-    return { err: 500, msg: err.msg || 'Internal server error occurred.' };
+    return { err: 500, msg: err.msg || "Internal server error occurred." };
   }
 };

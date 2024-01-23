@@ -1,15 +1,19 @@
-import express from 'express';
-import dotenv from 'dotenv/config';
-import mongoDBConnect from './mongoDB/connection.js';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import userRoutes from './routes/user.js';
-import chatRoutes from './routes/chat.js';
-import messageRoutes from './routes/message.js';
-import jobRoutes from './routes/job.js';
-import * as Server from 'socket.io';
-import morgan from 'morgan';
+import express from "express";
+import dotenv from "dotenv/config";
+import mongoDBConnect from "./mongoDB/connection.js";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cors from "cors";
+import userRoutes from "./routes/user.js";
+import chatRoutes from "./routes/chat.js";
+import pocketRoutes from "./routes/pocket.js";
+import messageRoutes from "./routes/message.js";
+import notificationRoutes from "./routes/notification.js";
+import transactionRoutes from "./routes/transaction.js";
+
+import jobRoutes from "./routes/job.js";
+import * as Server from "socket.io";
+import morgan from "morgan";
 
 const app = express();
 
@@ -23,14 +27,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsConfig));
 
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
-app.use('/', userRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/message', messageRoutes);
-app.use('/api/job', jobRoutes);
+app.use("/", userRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRoutes);
+app.use("/api/job", jobRoutes);
+app.use("/api/pocket", pocketRoutes);
+app.use("/api/notification", notificationRoutes);
+app.use("/api/transaction", transactionRoutes);
 
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", false);
 mongoDBConnect();
 const server = app.listen(PORT, () => {
   console.log(`Server Listening at PORT - ${PORT}`);
@@ -38,26 +45,26 @@ const server = app.listen(PORT, () => {
 const io = new Server.Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: '*',
+    origin: "*",
   },
 });
-io.on('connection', (socket) => {
-  socket.on('setup', (userData) => {
+io.on("connection", (socket) => {
+  socket.on("setup", (userData) => {
     socket.join(userData.id);
-    socket.emit('connected');
+    socket.emit("connected");
   });
-  socket.on('join room', (room) => {
+  socket.on("join room", (room) => {
     socket.join(room);
   });
-  socket.on('typing', (room) => socket.in(room).emit('typing'));
-  socket.on('stop typing', (room) => socket.in(room).emit('stop typing'));
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.on('new message', (newMessageRecieve) => {
+  socket.on("new message", (newMessageRecieve) => {
     var chat = newMessageRecieve.chatId;
-    if (!chat.users) console.log('chats.users is not defined');
+    if (!chat.users) console.log("chats.users is not defined");
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieve.sender._id) return;
-      socket.in(user._id).emit('message recieved', newMessageRecieve);
+      socket.in(user._id).emit("message recieved", newMessageRecieve);
     });
   });
 });
