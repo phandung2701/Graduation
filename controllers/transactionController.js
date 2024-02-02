@@ -7,7 +7,7 @@ export const getAllTransaction = async (req, res) => {
       .populate("receiverId")
       .populate("senderId");
 
-    return res.status(200).json({ transactions });
+    return res.status(200).json(transactions);
   } catch (err) {
     console.log(err.stack);
     return res.status(500).json(err);

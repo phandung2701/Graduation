@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const chatSchema = mongoose.Schema(
   {
     photo: {
       type: String,
-      default: 'https://cdn-icons-png.flaticon.com/512/9790/9790561.png',
+      default: "https://cdn-icons-png.flaticon.com/512/9790/9790561.png",
     },
     chatName: {
       type: String,
@@ -15,21 +15,21 @@ const chatSchema = mongoose.Schema(
     users: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
       },
     ],
     latestMessage: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Message',
+      ref: "Message",
     },
     groupAdmin: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
   },
   {
     timestamps: true,
   }
 );
-const chatModel = mongoose.model('Chat', chatSchema);
+const chatModel = mongoose.model("Chat", chatSchema);
 export default chatModel;

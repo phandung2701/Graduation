@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -17,11 +17,11 @@ const userSchema = mongoose.Schema(
     },
     bio: {
       type: String,
-      default: 'Available',
+      default: "Available",
     },
     role: {
       type: String,
-      default: 'client',
+      default: "client",
     },
     interest: {
       type: String,
@@ -37,7 +37,7 @@ const userSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: 'active',
+      default: "active",
     },
     creditCardStatus: {
       type: Boolean,
@@ -46,12 +46,12 @@ const userSchema = mongoose.Schema(
     profilePic: {
       type: String,
       default:
-        'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
     contacts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
       },
     ],
   },
@@ -59,8 +59,8 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 12);
   }
   next();
@@ -68,18 +68,18 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.generateAuthToken = async function () {
   try {
     let token = jwt.sign(
-      { id: this._id, email: this.email },
+      { id: this._id, email: this.email, role: this.role },
       process.env.SECRET,
       {
-        expiresIn: '24h',
+        expiresIn: "24h",
       }
     );
 
     return token;
   } catch (error) {
-    console.log('error while generating token');
+    console.log("error while generating token");
   }
 };
 
-const userModel = mongoose.model('User', userSchema);
+const userModel = mongoose.model("User", userSchema);
 export default userModel;

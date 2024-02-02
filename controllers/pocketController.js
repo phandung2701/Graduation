@@ -5,7 +5,7 @@ export const rechargePocket = async (req, res) => {
   try {
     const { money } = req.body;
     const user = req.rootUserId;
-    if (!user) return res.status(401).json("User not exist");
+    if (!user) return res.status(200).json({ err: 401, msg: "User not exist" });
     await pocketModel.updateOne({ user }, { $inc: { balance: Number(money) } });
     common.transaction({ amount: money, receiverId: user, senderId: user });
     common.notification({
@@ -15,10 +15,10 @@ export const rechargePocket = async (req, res) => {
       )}$ into your account.`,
       user: user,
     });
-    return res.status(200).json("recharge pocket success");
+    return res.status(200).json({ err: 200, msg: "recharge pocket success" });
   } catch (err) {
     console.log(err);
-    return res.status(500).json(err);
+    return res.status(200).json({ err: 500, msg: err });
   }
 };
 

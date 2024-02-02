@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const JobApplySchema = mongoose.Schema(
   {
     sid: {
@@ -6,11 +6,11 @@ const JobApplySchema = mongoose.Schema(
     },
     job: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Job',
+      ref: "Job",
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     status: {
       type: String,
@@ -28,12 +28,13 @@ const JobApplySchema = mongoose.Schema(
       type: Date,
     },
     progress: {
-      type: String,
+      type: Number,
+      default: 0,
     },
   },
   {
     timestamps: true,
   }
 );
-const JobApplyModel = mongoose.model('job_apply', JobApplySchema);
+const JobApplyModel = mongoose.model("job_apply", JobApplySchema);
 export default JobApplyModel;

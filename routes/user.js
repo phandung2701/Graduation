@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import {
   register,
   login,
@@ -11,21 +11,23 @@ import {
   createUser,
   changePassword,
   findUsers,
-} from '../controllers/user.js';
-import { Auth } from '../middleware/user.js';
+  updatePermission,
+} from "../controllers/userController.js";
+import { Auth, Admin } from "../middleware/user.js";
 
 const router = express.Router();
-router.post('/auth/register', register);
-router.post('/user/create', Auth, createUser);
-router.post('/user/list', Auth, findUsers);
+router.post("/auth/register", register);
+router.post("/user/create", Admin, createUser);
+router.get("/user/list", Admin, findUsers);
 
-router.post('/user/changePassword', Auth, changePassword);
+router.post("/user/changePassword", Auth, changePassword);
+router.post("/user/updatePermission", Admin, updatePermission);
 
-router.post('/auth/login', login);
-router.get('/auth/valid', Auth, validUser);
-router.get('/auth/logout', Auth, logout);
-router.post('/api/google', googleAuth);
-router.get('/api/user?', Auth, searchUsers);
-router.get('/api/users/:id', Auth, getUserById);
-router.patch('/api/users/update/:id', Auth, updateInfo);
+router.post("/auth/login", login);
+router.get("/auth/valid", Auth, validUser);
+router.get("/auth/logout", Auth, logout);
+router.post("/api/google", googleAuth);
+router.get("/api/user?", Auth, searchUsers);
+router.get("/api/users/:id", Auth, getUserById);
+router.patch("/api/users/update/:id", Auth, updateInfo);
 export default router;

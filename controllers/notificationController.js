@@ -7,7 +7,8 @@ export const getAllNotification = async (req, res) => {
     let notifications = await notificationModel
       .find()
       .sort({ _id: -1 })
-      .populate("user");
+      .populate("user")
+      .populate("sendTo");
     return res.status(200).json({ notifications });
   } catch (err) {
     console.log(err.stack);
@@ -22,6 +23,7 @@ export const getNotificationByUser = async (req, res) => {
     let notifications = await notificationModel
       .find({ user: user })
       .populate("user")
+      .populate("sendTo")
       .sort({ _id: -1 });
     return res.status(200).json(notifications);
   } catch (err) {

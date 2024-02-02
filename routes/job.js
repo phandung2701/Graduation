@@ -12,9 +12,12 @@ import {
   approveJob,
   findJobsApply,
   applicationList,
+  doneJob,
 } from "../controllers/jobController.js";
 
 router.post("/approve", Auth, approveJob);
+router.post("/done", Auth, doneJob);
+
 router.post("/applicationList", Auth, applicationList);
 
 router.post("/apply", Auth, applyJob);

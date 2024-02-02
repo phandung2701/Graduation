@@ -12,11 +12,26 @@ export const register = async (req, res) => {
     if (existingUser)
       return res.status(400).json({ error: "User already Exits" });
 
-    const newuser = new user({ email, password, name: name });
+    const newuser = new user({
+      email,
+      password,
+      name: name,
+      sid: common.createDigitsCode(16),
+    });
 
     const token = await newuser.generateAuthToken();
 
-    await newuser.save();
+    await activityModel.create({
+      sid: common.createDigitsCode(16),
+      action: "Register User",
+      meta: newuser,
+    });
+    let userCreate = await user.create(newuser);
+
+    await pocketModel.create({
+      sid: common.createDigitsCode(16),
+      user: userCreate._id,
+    });
 
     res.json({ message: "success", token: token });
   } catch (error) {
@@ -191,6 +206,19 @@ export const changePassword = async (req, res) => {
     );
 
     return res.status(200).json("Change password success");
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+};
+
+export const updatePermission = async (req, res) => {
+  try {
+    const { _id, role } = req.body;
+    if (!_id) return res.status(401).json("Invalid User");
+
+    await user.updateOne({ _id: _id }, { role: role });
+
+    return res.status(200).json("update permission success");
   } catch (err) {
     return res.status(500).send(err);
   }
